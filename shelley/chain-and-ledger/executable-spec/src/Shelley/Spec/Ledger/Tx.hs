@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE LambdaCase #-}
@@ -14,11 +15,13 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Shelley.Spec.Ledger.Tx
   ( -- transaction
     Tx
       ( Tx,
+        Tx',
         _body,
         _witnessSet,
         _metadata,
@@ -50,6 +53,7 @@ module Shelley.Spec.Ledger.Tx
   )
 where
 
+import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Binary
   ( Annotator (..),
     Decoder,
@@ -184,13 +188,17 @@ data Tx era = Tx'
     _metadata' :: !(StrictMaybe MetaData),
     txFullBytes :: LByteString
   }
-  deriving (Show, Eq, Generic)
+  deriving (Generic)
   deriving
     (NoUnexpectedThunks)
     via AllowThunksIn
           '[ "txFullBytes"
            ]
           (Tx era)
+
+deriving instance
+  ShelleyEra era =>
+  Show (Tx era)
 
 pattern Tx ::
   Era era =>
@@ -220,7 +228,7 @@ pattern Tx {_body, _witnessSet, _metadata} <-
 
 {-# COMPLETE Tx #-}
 
-instance Era era => HashAnnotated (Tx era) era
+instance ShelleyEra era => HashAnnotated (Tx era) era
 
 segwitTx ::
   Era era =>
@@ -286,12 +294,15 @@ keyBy :: Ord k => (a -> k) -> [a] -> Map k a
 keyBy f xs = Map.fromList $ (\x -> (f x, x)) <$> xs
 
 instance
-  (Era era) =>
+  ShelleyEra era =>
   ToCBOR (Tx era)
   where
   toCBOR tx = encodePreEncoded . BSL.toStrict $ txFullBytes tx
 
-instance Era era => FromCBOR (Annotator (Tx era)) where
+instance
+  ShelleyEra era =>
+  FromCBOR (Annotator (Tx era))
+  where
   fromCBOR = annotatorSlice $
     decodeRecordNamed "Tx" (const 3) $ do
       body <- fromCBOR

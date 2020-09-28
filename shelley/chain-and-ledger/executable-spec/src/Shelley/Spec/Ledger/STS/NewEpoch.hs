@@ -1,11 +1,15 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE EmptyDataDecls #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Shelley.Spec.Ledger.STS.NewEpoch
   ( NEWEPOCH,
@@ -15,7 +19,7 @@ module Shelley.Spec.Ledger.STS.NewEpoch
   )
 where
 
-import Cardano.Ledger.Era
+import Cardano.Ledger.Shelley (ShelleyEra)
 import qualified Cardano.Ledger.Val as Val
 import Cardano.Prelude (NoUnexpectedThunks (..))
 import Control.State.Transition
@@ -40,14 +44,17 @@ data NewEpochPredicateFailure era
   | CorruptRewardUpdate
       !(RewardUpdate era) -- The reward update which violates an invariant
   | MirFailure (PredicateFailure (MIR era)) -- Subtransition Failures
-  deriving (Show, Generic, Eq)
+  deriving (Generic)
+
+deriving stock instance
+  Show (NewEpochPredicateFailure era)
+
+deriving stock instance
+  Eq (NewEpochPredicateFailure era)
 
 instance NoUnexpectedThunks (NewEpochPredicateFailure era)
 
-instance
-  Era era =>
-  STS (NEWEPOCH era)
-  where
+instance ShelleyEra era => STS (NEWEPOCH era) where
   type State (NEWEPOCH era) = NewEpochState era
 
   type Signal (NEWEPOCH era) = EpochNo
@@ -72,7 +79,8 @@ instance
 
 newEpochTransition ::
   forall era.
-  Era era =>
+  ( ShelleyEra era
+  ) =>
   TransitionRule (NEWEPOCH era)
 newEpochTransition = do
   TRC
@@ -118,13 +126,13 @@ calculatePoolDistr (SnapShot (Stake stake) delegs poolParams) =
    in PoolDistr $ Map.intersectionWith IndividualPoolStake sd (Map.map _poolVrf poolParams)
 
 instance
-  Era era =>
+  ShelleyEra era =>
   Embed (EPOCH era) (NEWEPOCH era)
   where
   wrapFailed = EpochFailure
 
 instance
-  Era era =>
+  ShelleyEra era =>
   Embed (MIR era) (NEWEPOCH era)
   where
   wrapFailed = MirFailure

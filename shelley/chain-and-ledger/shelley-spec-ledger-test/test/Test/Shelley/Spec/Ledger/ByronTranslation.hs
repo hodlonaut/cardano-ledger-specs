@@ -1,3 +1,4 @@
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
@@ -7,13 +8,15 @@ module Test.Shelley.Spec.Ledger.ByronTranslation (testGroupByronTranslation) whe
 import Data.Proxy
 import qualified Cardano.Chain.Common as Byron
 import qualified Cardano.Chain.UTxO as Byron
-import Cardano.Ledger.Era
+import qualified Cardano.Ledger.Crypto as CryptoClass
 import Shelley.Spec.Ledger.API.ByronTranslation
+import Cardano.Ledger.Shelley (Shelley)
 import Shelley.Spec.Ledger.Address
 import Shelley.Spec.Ledger.Coin
 import Shelley.Spec.Ledger.TxBody
 import Test.Cardano.Chain.UTxO.Gen (genCompactTxOut)
 import Test.QuickCheck.Hedgehog (hedgehog)
+import Test.Shelley.Spec.Ledger.ConcreteCryptoTypes (C_Crypto)
 import Test.Tasty
 import Test.Tasty.QuickCheck
 
@@ -35,7 +38,7 @@ testGroupByronTranslation proxy =
 prop_translateTxOut_correctness :: forall era. Era era => Proxy era -> Byron.CompactTxOut -> Property
 prop_translateTxOut_correctness _proxy compactTxOut =
   translateTxOutByronToShelley
-    @era
+    @C_Crypto
     (Byron.fromCompactTxOut compactTxOut)
     === translateCompactTxOutByronToShelley compactTxOut
 
@@ -44,10 +47,10 @@ prop_translateTxOut_correctness _proxy compactTxOut =
 ------------------------------------------------------------------------------}
 
 translateTxOutByronToShelley ::
-  forall era.
-  Era era =>
+  forall crypto.
+  CryptoClass.Crypto crypto =>
   Byron.TxOut ->
-  TxOut era
+  TxOut (Shelley crypto)
 translateTxOutByronToShelley (Byron.TxOut addr amount) =
   TxOut (translateAddr addr) (translateAmount amount)
   where

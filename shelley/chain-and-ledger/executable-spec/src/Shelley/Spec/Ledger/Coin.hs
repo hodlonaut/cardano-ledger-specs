@@ -1,23 +1,26 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Shelley.Spec.Ledger.Coin
   ( Coin (..),
+    Core.CompactForm (..),
     word64ToCoin,
     coinToRational,
     rationalToCoinViaFloor,
   )
 where
 
-import Cardano.Binary (DecoderError (..), FromCBOR (..), ToCBOR (..))
-import Cardano.Prelude (NFData, NoUnexpectedThunks (..), cborError)
+import Cardano.Binary (FromCBOR (..), ToCBOR (..))
+import qualified Cardano.Ledger.Core as Core
+import Cardano.Prelude (NFData, NoUnexpectedThunks (..))
 import Data.Aeson (FromJSON, ToJSON)
 import Data.Group (Abelian, Group (..))
 import Data.Monoid (Sum (..))
 import Data.PartialOrd (PartialOrd)
-import Data.Text (pack)
 import Data.Word (Word64)
 import GHC.Generics (Generic)
 import Quiet
@@ -35,6 +38,7 @@ newtype Coin = Coin {unCoin :: Integer}
       NFData
     )
   deriving (Show) via Quiet Coin
+  deriving (ToCBOR, FromCBOR) via Core.Compact Coin
   deriving (Semigroup, Monoid, Group, Abelian) via Sum Integer
   deriving newtype (PartialOrd)
 
@@ -47,18 +51,20 @@ coinToRational (Coin c) = fromIntegral c
 rationalToCoinViaFloor :: Rational -> Coin
 rationalToCoinViaFloor r = Coin . floor $ r
 
-isValidCoinValue :: Integer -> Bool
-isValidCoinValue c = 0 <= c && c <= (fromIntegral (maxBound :: Word64))
+-- FIXME:
+-- if coin is less than 0 or greater than (maxBound :: Word64), then
+-- fromIntegral constructs the incorrect value. for now this is handled
+-- with an erroring bounds check here. where should this really live?
+instance Core.Compactible Coin where
+  newtype CompactForm Coin = CompactCoin Word64
+  toCompact (Coin c) | c < 0 = error "out of bounds"
+                     | c > (fromIntegral (maxBound :: Word64)) =
+                           error "out of bounds"
+                     | otherwise = CompactCoin (fromIntegral c)
+  fromCompact (CompactCoin c) = word64ToCoin c
 
-instance ToCBOR Coin where
-  toCBOR (Coin c) =
-    if isValidCoinValue c
-      then toCBOR (fromInteger c :: Word64)
-      else toCBOR c
+instance ToCBOR (Core.CompactForm Coin) where
+  toCBOR (CompactCoin c) = toCBOR c
 
-instance FromCBOR Coin where
-  fromCBOR = do
-    c <- fromCBOR
-    if isValidCoinValue c
-      then pure (Coin c)
-      else cborError $ DecoderErrorCustom "Invalid Coin Value" (pack $ show c)
+instance FromCBOR (Core.CompactForm Coin) where
+  fromCBOR = CompactCoin <$> fromCBOR

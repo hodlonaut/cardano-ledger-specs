@@ -126,6 +126,7 @@ import Test.Shelley.Spec.Ledger.Serialisation.Generators.Bootstrap
   ( genBootstrapAddress,
     genSignature,
   )
+import Test.Shelley.Spec.Ledger.Utils (ShelleyTest)
 import Test.Tasty.QuickCheck (Gen, choose, elements)
 
 genHash :: forall a h. HashAlgorithm h => Gen (Hash.Hash h a)
@@ -144,7 +145,7 @@ mkDummyHash = coerce . hashWithSerialiser @h toCBOR
 type MockGen era = (Mock (Crypto era), Arbitrary (VerKeyDSIGN (DSIGN (Crypto era))))
 
 instance
-  (Era era, Mock (Crypto era)) =>
+  (ShelleyTest era, Mock (Crypto era)) =>
   Arbitrary (Block era)
   where
   arbitrary = do
@@ -173,7 +174,7 @@ instance
       p :: Proxy era
       p = Proxy
 
-instance (Era era, Mock (Crypto era)) => Arbitrary (BHeader era) where
+instance (ShelleyTest era, Mock (Crypto era)) => Arbitrary (BHeader era) where
   arbitrary = do
     res <- arbitrary :: Gen (Block era)
     return $ case res of
@@ -229,7 +230,7 @@ instance (Era era, Mock (Crypto era)) => Arbitrary (Update era) where
   arbitrary = genericArbitraryU
   shrink = genericShrink
 
-instance (Era era, Mock (Crypto era)) => Arbitrary (TxBody era) where
+instance (ShelleyTest era, Mock (Crypto era)) => Arbitrary (TxBody era) where
   -- Our arbitrary instance constructs things using the pattern in order to have
   -- the correct serialised bytes.
   arbitrary =
@@ -278,7 +279,7 @@ instance Arbitrary MetaData where
 maxTxWits :: Int
 maxTxWits = 5
 
-instance (Era era, Mock (Crypto era)) => Arbitrary (Tx era) where
+instance (ShelleyTest era, Mock (Crypto era)) => Arbitrary (Tx era) where
   -- Our arbitrary instance constructs things using the pattern in order to have
   -- the correct serialised bytes.
   arbitrary =
@@ -296,7 +297,7 @@ instance Era era => Arbitrary (TxIn era) where
       <$> (TxId <$> genHash)
       <*> arbitrary
 
-instance (Era era, Mock (Crypto era)) => Arbitrary (TxOut era) where
+instance (ShelleyTest era, Mock (Crypto era)) => Arbitrary (TxOut era) where
   arbitrary = TxOut <$> arbitrary <*> arbitrary
 
 instance Arbitrary Nonce where
@@ -333,14 +334,14 @@ instance Era era => Arbitrary (STS.PpupPredicateFailure era) where
   shrink = genericShrink
 
 instance
-  (Era era, Mock (Crypto era)) =>
+  (ShelleyTest era, Mock (Crypto era)) =>
   Arbitrary (STS.UtxoPredicateFailure era)
   where
   arbitrary = genericArbitraryU
   shrink = genericShrink
 
 instance
-  (Era era, MockGen era) =>
+  (ShelleyTest era, MockGen era) =>
   Arbitrary (STS.UtxowPredicateFailure era)
   where
   arbitrary = genericArbitraryU
@@ -375,14 +376,14 @@ instance
   shrink = genericShrink
 
 instance
-  (Era era, MockGen era) =>
+  (ShelleyTest era, MockGen era) =>
   Arbitrary (STS.LedgerPredicateFailure era)
   where
   arbitrary = genericArbitraryU
   shrink = genericShrink
 
 instance
-  (Era era, MockGen era) =>
+  (ShelleyTest era, MockGen era) =>
   Arbitrary (STS.LedgersPredicateFailure era)
   where
   arbitrary = genericArbitraryU
@@ -458,7 +459,7 @@ instance Era era => Arbitrary (STS.PrtclState era) where
   arbitrary = genericArbitraryU
   shrink = genericShrink
 
-instance (Era era, Mock (Crypto era)) => Arbitrary (UTxO era) where
+instance (ShelleyTest era, Mock (Crypto era)) => Arbitrary (UTxO era) where
   arbitrary = genericArbitraryU
   shrink = genericShrink
 
@@ -524,15 +525,15 @@ instance (Era era, Mock (Crypto era)) => Arbitrary (DPState era) where
   arbitrary = genericArbitraryU
   shrink = genericShrink
 
-instance (Era era, Mock (Crypto era)) => Arbitrary (UTxOState era) where
+instance (ShelleyTest era, Mock (Crypto era)) => Arbitrary (UTxOState era) where
   arbitrary = genericArbitraryU
   shrink = genericShrink
 
-instance (Era era, Mock (Crypto era)) => Arbitrary (LedgerState era) where
+instance (ShelleyTest era, Mock (Crypto era)) => Arbitrary (LedgerState era) where
   arbitrary = genericArbitraryU
   shrink = genericShrink
 
-instance (Era era, Mock (Crypto era)) => Arbitrary (NewEpochState era) where
+instance (ShelleyTest era, Mock (Crypto era)) => Arbitrary (NewEpochState era) where
   arbitrary = genericArbitraryU
   shrink = genericShrink
 
@@ -546,7 +547,7 @@ instance Era era => Arbitrary (PoolDistr era) where
     where
       genVal = IndividualPoolStake <$> arbitrary <*> genHash
 
-instance (Era era, Mock (Crypto era)) => Arbitrary (EpochState era) where
+instance (ShelleyTest era, Mock (Crypto era)) => Arbitrary (EpochState era) where
   arbitrary =
     EpochState
       <$> arbitrary

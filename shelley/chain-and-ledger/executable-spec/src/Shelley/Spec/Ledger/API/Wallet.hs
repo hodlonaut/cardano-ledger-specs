@@ -1,4 +1,9 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Shelley.Spec.Ledger.API.Wallet
   ( getNonMyopicMemberRewards,
@@ -10,6 +15,7 @@ module Shelley.Spec.Ledger.API.Wallet
   )
 where
 
+import Cardano.Ledger.Shelley (ShelleyEra)
 import qualified Cardano.Crypto.VRF as VRF
 import Cardano.Ledger.Crypto (VRF)
 import Cardano.Ledger.Era (Crypto, Era)
@@ -65,7 +71,11 @@ import Shelley.Spec.Ledger.UTxO (UTxO (..))
 -- stake.
 --
 -- This is not based on any snapshot, but uses the current ledger state.
-poolsByTotalStakeFraction :: Era era => Globals -> ShelleyState era -> PoolDistr era
+poolsByTotalStakeFraction ::
+  ShelleyEra era =>
+  Globals ->
+  ShelleyState era ->
+  PoolDistr era
 poolsByTotalStakeFraction globals ss =
   PoolDistr poolsByTotalStake
   where
@@ -93,7 +103,7 @@ getTotalStake globals ss =
 --
 -- This is not based on any snapshot, but uses the current ledger state.
 getNonMyopicMemberRewards ::
-  Era era =>
+  ShelleyEra era =>
   Globals ->
   ShelleyState era ->
   Set (Either Coin (Credential 'Staking era)) ->
@@ -118,7 +128,14 @@ getNonMyopicMemberRewards globals ss creds =
     EB.SnapShot stake delegs poolParams = currentSnapshot ss
     poolData =
       Map.mapWithKey
-        (\k p -> (percentile' (histLookup k), p, toShare . fold . EB.unStake $ EB.poolStake k delegs stake))
+        ( \k p ->
+            ( percentile' (histLookup k),
+              p,
+              toShare . fold
+                . EB.unStake
+                $ EB.poolStake k delegs stake
+            )
+        )
         poolParams
     histLookup k = fromMaybe mempty (Map.lookup k ls)
     topPools = getTopRankedPools rPot (Coin totalStake) pp poolParams (fmap percentile' ls)
@@ -147,7 +164,7 @@ getNonMyopicMemberRewards globals ss creds =
 -- When ranking pools, and reporting their saturation level, in the wallet, we
 -- do not want to use one of the regular snapshots, but rather the most recent
 -- ledger state.
-currentSnapshot :: Era era => ShelleyState era -> EB.SnapShot era
+currentSnapshot :: ShelleyEra era => ShelleyState era -> EB.SnapShot era
 currentSnapshot ss =
   stakeDistr utxo dstate pstate
   where

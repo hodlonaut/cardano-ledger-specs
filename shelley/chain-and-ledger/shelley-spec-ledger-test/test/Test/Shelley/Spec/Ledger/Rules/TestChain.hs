@@ -16,7 +16,7 @@ module Test.Shelley.Spec.Ledger.Rules.TestChain
   )
 where
 
-import Cardano.Ledger.Val((<->), (<+>))
+import Cardano.Ledger.Val ((<+>), (<->))
 import Control.Iterate.SetAlgebra (dom, domain, eval, (<|), (∩), (⊆))
 import Control.State.Transition.Extended (TRC (TRC))
 import Control.State.Transition.Trace
@@ -61,6 +61,7 @@ import Test.Shelley.Spec.Ledger.Generator.Block (tickChainState)
 import Test.Shelley.Spec.Ledger.Generator.Core (GenEnv (geConstants))
 import qualified Test.Shelley.Spec.Ledger.Generator.Presets as Preset (genEnv)
 import Test.Shelley.Spec.Ledger.Generator.Trace.Chain (mkGenesisChainState)
+import Test.Shelley.Spec.Ledger.Orphans ()
 import qualified Test.Shelley.Spec.Ledger.Rules.TestPoolreap as TestPoolreap
 import Test.Shelley.Spec.Ledger.Utils
   ( applySTSTest,
@@ -158,7 +159,7 @@ checkWithdrawlBound SourceSignalTarget {source, signal, target} =
             . chainNes
             $ source
         )
-        <->  fold
+        <-> fold
           ( _rewards . _dstate
               . _delegationState
               . esLState

@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -6,6 +7,8 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE StrictData #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 -- | Integration between the Shelley ledger and its corresponding (Transitional
 -- Praos) protocol.
@@ -27,6 +30,7 @@ module Shelley.Spec.Ledger.API.Protocol
   )
 where
 
+import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Binary (FromCBOR (..), ToCBOR (..), encodeListLen)
 import Cardano.Crypto.DSIGN.Class
 import Cardano.Crypto.KES.Class
@@ -174,7 +178,14 @@ currentLedgerView = view
 
 newtype FutureLedgerViewError era
   = FutureLedgerViewError [PredicateFailure (TICK era)]
-  deriving (Eq, Show)
+
+deriving stock instance
+  (Eq (PredicateFailure (TICK era))) =>
+  Eq (FutureLedgerViewError era)
+
+deriving stock instance
+  (Show (PredicateFailure (TICK era))) =>
+  Show (FutureLedgerViewError era)
 
 -- | Anachronistic ledger view
 --
@@ -183,7 +194,7 @@ newtype FutureLedgerViewError era
 --   appropriate to that slot.
 futureLedgerView ::
   forall era m.
-  ( Era era,
+  ( ShelleyEra era,
     MonadError (FutureLedgerViewError era) m
   ) =>
   Globals ->
