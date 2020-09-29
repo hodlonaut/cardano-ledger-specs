@@ -15,10 +15,10 @@ module Shelley.Spec.Ledger.API.Wallet
   )
 where
 
-import Cardano.Ledger.Shelley (ShelleyEra)
 import qualified Cardano.Crypto.VRF as VRF
 import Cardano.Ledger.Crypto (VRF)
 import Cardano.Ledger.Era (Crypto, Era)
+import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Slotting.EpochInfo (epochInfoRange)
 import Cardano.Slotting.Slot (SlotNo)
 import qualified Data.ByteString.Short as BSS

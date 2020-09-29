@@ -16,6 +16,7 @@ module Test.Shelley.Spec.Ledger.Examples.PoolReReg
 where
 
 import Cardano.Ledger.Era (Crypto (..))
+import Cardano.Ledger.Val ((<+>), (<->))
 import qualified Data.Map.Strict as Map
 import qualified Data.Sequence.Strict as StrictSeq
 import qualified Data.Set as Set
@@ -50,7 +51,6 @@ import Shelley.Spec.Ledger.TxBody
     Wdrl (..),
   )
 import Shelley.Spec.Ledger.UTxO (UTxO (..), makeWitnessesVKey, txid)
-import Cardano.Ledger.Val((<->), (<+>))
 import Test.Shelley.Spec.Ledger.ConcreteCryptoTypes (ExMock)
 import Test.Shelley.Spec.Ledger.Examples (CHAINExample (..), testCHAINExample)
 import qualified Test.Shelley.Spec.Ledger.Examples.Cast as Cast
@@ -71,7 +71,7 @@ import Test.Shelley.Spec.Ledger.Generator.Core
     mkOCert,
     zero,
   )
-import Test.Shelley.Spec.Ledger.Utils (getBlockNonce, testGlobals, ShelleyTest)
+import Test.Shelley.Spec.Ledger.Utils (ShelleyTest, getBlockNonce, testGlobals)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase)
 
@@ -92,7 +92,7 @@ feeTx1 :: Coin
 feeTx1 = Coin 3
 
 aliceCoinEx1 :: Coin
-aliceCoinEx1 = aliceInitCoin <->  _poolDeposit ppEx <-> feeTx1
+aliceCoinEx1 = aliceInitCoin <-> _poolDeposit ppEx <-> feeTx1
 
 txbodyEx1 :: ShelleyTest era => TxBody era
 txbodyEx1 =

@@ -22,13 +22,13 @@ module Shelley.Spec.Ledger.STS.Utxo
   )
 where
 
-import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Binary
   ( FromCBOR (..),
     ToCBOR (..),
     encodeListLen,
   )
 import qualified Cardano.Ledger.Core as Core
+import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Ledger.Val ((<->))
 import qualified Cardano.Ledger.Val as Val
 import Cardano.Prelude (NoUnexpectedThunks (..), asks)
@@ -320,7 +320,7 @@ utxoInductive = do
 
   let outputs = Map.elems $ unUTxO (txouts txb)
       minUTxOValue = _minUTxOValue pp
-      -- minUTxOValue deposit comparison done as Coin because this rule 
+      -- minUTxOValue deposit comparison done as Coin because this rule
       -- is correct strictly in the Shelley era (in shelleyMA we would need to
       -- additionally check that all amounts are non-negative)
       outputsTooSmall = [out | out@(TxOut _ c) <- outputs, (Val.coin c) < (Val.scaledMinDeposit c minUTxOValue)]

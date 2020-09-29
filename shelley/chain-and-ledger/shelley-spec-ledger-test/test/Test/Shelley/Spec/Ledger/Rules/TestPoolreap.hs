@@ -1,11 +1,11 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE FlexibleContexts #-}
 
 module Test.Shelley.Spec.Ledger.Rules.TestPoolreap
   ( constantSumPots,
@@ -55,7 +55,8 @@ import Test.Shelley.Spec.Ledger.Rules.TestPool (getRetiring)
 
 -- | Check that after a POOLREAP certificate transition the pool is removed from
 -- the stake pool and retiring maps.
-removedAfterPoolreap :: forall era.
+removedAfterPoolreap ::
+  forall era.
   [SourceSignalTarget (POOLREAP era)] ->
   Property
 removedAfterPoolreap tr =

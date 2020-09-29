@@ -64,7 +64,6 @@ module Shelley.Spec.Ledger.TxBody
   )
 where
 
-import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Binary
   ( Annotator (..),
     Case (..),
@@ -86,6 +85,7 @@ import Cardano.Binary
   )
 import qualified Cardano.Ledger.Core as Core
 import Cardano.Ledger.Era
+import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Prelude
   ( AllowThunksIn (..),
     LByteString,
@@ -574,7 +574,7 @@ data TxBody era = TxBody'
   }
   deriving (Generic)
 
-deriving instance ( ShelleyEra era) => Show (TxBody era)
+deriving instance (ShelleyEra era) => Show (TxBody era)
 
 deriving via AllowThunksIn '["bodyBytes"] (TxBody era) instance Era era => NoUnexpectedThunks (TxBody era)
 

@@ -5,12 +5,12 @@
 
 module Test.Shelley.Spec.Ledger.ByronTranslation (testGroupByronTranslation) where
 
-import Data.Proxy
 import qualified Cardano.Chain.Common as Byron
 import qualified Cardano.Chain.UTxO as Byron
 import qualified Cardano.Ledger.Crypto as CryptoClass
-import Shelley.Spec.Ledger.API.ByronTranslation
 import Cardano.Ledger.Shelley (Shelley)
+import Data.Proxy
+import Shelley.Spec.Ledger.API.ByronTranslation
 import Shelley.Spec.Ledger.Address
 import Shelley.Spec.Ledger.Coin
 import Shelley.Spec.Ledger.TxBody

@@ -1,11 +1,11 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 
 module Test.Shelley.Spec.Ledger.Rules.ClassifyTraces
   ( onlyValidLedgerSignalsAreGenerated,
@@ -16,8 +16,8 @@ module Test.Shelley.Spec.Ledger.Rules.ClassifyTraces
   )
 where
 
-import Cardano.Ledger.Era(Era)
 import Cardano.Binary (serialize')
+import Cardano.Ledger.Era (Era)
 import Cardano.Slotting.Slot (EpochSize (..))
 import qualified Control.State.Transition.Extended
 import Control.State.Transition.Trace
@@ -95,7 +95,9 @@ import Test.Shelley.Spec.Ledger.Generator.Trace.Chain (mkGenesisChainState)
 import Test.Shelley.Spec.Ledger.Generator.Trace.Ledger (mkGenesisLedgerState)
 import Test.Shelley.Spec.Ledger.Utils
 
-genesisChainState :: forall era a. Era era =>
+genesisChainState ::
+  forall era a.
+  Era era =>
   Maybe
     ( Control.State.Transition.Extended.IRC (CHAIN era) ->
       QC.Gen
@@ -104,12 +106,14 @@ genesisChainState :: forall era a. Era era =>
             (ChainState era)
         )
     )
-genesisChainState = Just $ mkGenesisChainState  (geConstants (genEnv p))
+genesisChainState = Just $ mkGenesisChainState (geConstants (genEnv p))
   where
     p :: Proxy era
     p = Proxy
 
-genesisLedgerState :: forall era a. Era era =>
+genesisLedgerState ::
+  forall era a.
+  Era era =>
   Maybe
     ( Control.State.Transition.Extended.IRC (LEDGER era) ->
       QC.Gen
@@ -136,7 +140,9 @@ relevantCasesAreCovered = do
     p :: Proxy C
     p = Proxy
 
-relevantCasesAreCoveredForTrace :: forall era. Era era =>
+relevantCasesAreCoveredForTrace ::
+  forall era.
+  Era era =>
   Trace (CHAIN era) ->
   Property
 relevantCasesAreCoveredForTrace tr = do

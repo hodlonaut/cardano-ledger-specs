@@ -89,14 +89,10 @@ deriving stock instance
   (Show (PredicateFailure (LEDGERS era))) =>
   Show (ApplyTxError era)
 
-instance
-  (ShelleyEra era) => ToCBOR (ApplyTxError era)
-  where
+instance (ShelleyEra era) => ToCBOR (ApplyTxError era) where
   toCBOR (ApplyTxError es) = toCBOR es
 
-instance
-  (ShelleyEra era) => FromCBOR (ApplyTxError era)
-  where
+instance (ShelleyEra era) => FromCBOR (ApplyTxError era) where
   fromCBOR = ApplyTxError <$> fromCBOR
 
 applyTxs ::

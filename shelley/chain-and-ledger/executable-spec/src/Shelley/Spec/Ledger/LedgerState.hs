@@ -91,7 +91,6 @@ module Shelley.Spec.Ledger.LedgerState
   )
 where
 
-import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Binary
   ( FromCBOR (..),
     ToCBOR (..),
@@ -99,6 +98,7 @@ import Cardano.Binary
   )
 import qualified Cardano.Ledger.Core as Core
 import Cardano.Ledger.Era (Era)
+import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Ledger.Val (invert, (<+>), (<->), (<×>))
 import qualified Cardano.Ledger.Val as Val
 import Cardano.Prelude (NFData, NoUnexpectedThunks (..))

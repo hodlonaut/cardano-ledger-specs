@@ -16,6 +16,7 @@ module Test.Shelley.Spec.Ledger.Examples.PoolLifetime
 where
 
 import Cardano.Ledger.Era (Crypto (..))
+import Cardano.Ledger.Val (invert, (<+>), (<->), (<×>))
 import Data.Foldable (fold)
 import qualified Data.Map.Strict as Map
 import Data.Ratio ((%))
@@ -77,7 +78,6 @@ import Shelley.Spec.Ledger.TxBody
     Wdrl (..),
   )
 import Shelley.Spec.Ledger.UTxO (UTxO (..), makeWitnessesVKey, txid)
-import Cardano.Ledger.Val((<->),(<×>),(<+>),invert)
 import Test.Shelley.Spec.Ledger.ConcreteCryptoTypes (ExMock)
 import Test.Shelley.Spec.Ledger.Examples (CHAINExample (..), testCHAINExample)
 import qualified Test.Shelley.Spec.Ledger.Examples.Cast as Cast
@@ -102,11 +102,11 @@ import Test.Shelley.Spec.Ledger.Generator.Core
     zero,
   )
 import Test.Shelley.Spec.Ledger.Utils
-  ( epochSize,
+  ( ShelleyTest,
+    epochSize,
     getBlockNonce,
     maxLLSupply,
     testGlobals,
-    ShelleyTest
   )
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase)
@@ -134,7 +134,7 @@ initStPoolLifetime = initSt initUTxO
 aliceCoinEx1 :: Coin
 aliceCoinEx1 =
   aliceInitCoin <-> _poolDeposit ppEx
-    <-> (3 <×>  _keyDeposit ppEx)
+    <-> (3 <×> _keyDeposit ppEx)
     <-> Coin 3
 
 carlMIR :: Coin

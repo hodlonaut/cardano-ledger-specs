@@ -21,8 +21,8 @@ module Shelley.Spec.Ledger.API.Validation
   )
 where
 
-import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Ledger.Era (Era)
+import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Prelude (NoUnexpectedThunks (..))
 import Control.Arrow (left, right)
 import Control.Monad.Except

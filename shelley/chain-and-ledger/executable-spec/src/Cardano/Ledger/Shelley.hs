@@ -1,22 +1,19 @@
-{-# LANGUAGE EmptyDataDecls #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE EmptyDataDecls #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Cardano.Ledger.Shelley where
 
-import Cardano.Ledger.Core (Value, Compactible (..))
-import Cardano.Ledger.Val (Val)
+import Cardano.Binary (FromCBOR (..), ToCBOR (..))
+import Cardano.Ledger.Core (Compactible (..), Value)
 import qualified Cardano.Ledger.Crypto as CryptoClass
 import Cardano.Ledger.Era
-import Shelley.Spec.Ledger.Coin (Coin)
-
-
-import Data.Typeable (Typeable)
-import Cardano.Binary (FromCBOR (..), ToCBOR (..))
+import Cardano.Ledger.Val (Val)
 import Cardano.Prelude (NFData, NoUnexpectedThunks (..))
-
+import Data.Typeable (Typeable)
+import Shelley.Spec.Ledger.Coin (Coin)
 
 --------------------------------------------------------------------------------
 -- Shelley Era
@@ -43,4 +40,3 @@ type ShelleyEra era =
     ToCBOR (Value era),
     Typeable (Value era)
   )
-

@@ -1,26 +1,22 @@
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
-
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE ConstraintKinds #-}
-
 
 module Test.Shelley.Spec.Ledger.Fees
   ( sizeTests,
   )
 where
 
-import Cardano.Crypto.VRF(VRFAlgorithm)
-import qualified Cardano.Ledger.Crypto as CC
-import qualified Cardano.Crypto.VRF as VRF
 import Cardano.Binary (serialize)
-import Cardano.Ledger.Era (Era(..))
+import Cardano.Crypto.VRF (VRFAlgorithm)
+import qualified Cardano.Crypto.VRF as VRF
+import qualified Cardano.Ledger.Crypto as CC
+import Cardano.Ledger.Era (Era (..))
 import qualified Data.ByteString.Base16.Lazy as Base16
 import qualified Data.ByteString.Char8 as BS (pack)
 import qualified Data.ByteString.Lazy as BSL
@@ -54,14 +50,14 @@ import Shelley.Spec.Ledger.BaseTypes
 import Shelley.Spec.Ledger.Coin (Coin (..))
 import Shelley.Spec.Ledger.Hashing (hashAnnotated)
 import Shelley.Spec.Ledger.Keys
-  ( KeyHash,
+  ( DSignable,
+    Hash,
+    KeyHash,
     KeyPair (..),
     KeyRole (..),
     asWitness,
     hashKey,
     vKey,
-    DSignable,
-    Hash,
   )
 import Shelley.Spec.Ledger.LedgerState (txsize)
 import qualified Shelley.Spec.Ledger.MetaData as MD
@@ -78,7 +74,7 @@ import Shelley.Spec.Ledger.TxBody
 import Shelley.Spec.Ledger.UTxO (makeWitnessesVKey)
 import Test.Shelley.Spec.Ledger.ConcreteCryptoTypes (C)
 import Test.Shelley.Spec.Ledger.Generator.Core (genesisId)
-import Test.Shelley.Spec.Ledger.Utils( mkKeyPair, mkAddr,  mkVRFKeyPair, unsafeMkUnitInterval , ShelleyTest)
+import Test.Shelley.Spec.Ledger.Utils (ShelleyTest, mkAddr, mkKeyPair, mkVRFKeyPair, unsafeMkUnitInterval)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (Assertion, testCase, (@?=))
 
@@ -92,7 +88,6 @@ sizeTest ::
 sizeTest _ b16 tx s = do
   (Base16.encode (serialize tx) @?= b16) >> (txsize tx @?= s)
 
-
 alicePay :: forall era. Era era => KeyPair 'Payment era
 alicePay = KeyPair @'Payment @era vk sk
   where
@@ -103,25 +98,25 @@ aliceStake = KeyPair vk sk
   where
     (sk, vk) = mkKeyPair @era (0, 0, 0, 0, 1)
 
-aliceSHK :: forall era . Era era => Credential 'Staking era
+aliceSHK :: forall era. Era era => Credential 'Staking era
 aliceSHK = (KeyHashObj . hashKey . vKey) aliceStake
 
-alicePool :: forall era . Era era => KeyPair 'StakePool era
+alicePool :: forall era. Era era => KeyPair 'StakePool era
 alicePool = KeyPair vk sk
   where
     (sk, vk) = mkKeyPair @era (0, 0, 0, 0, 2)
 
-alicePoolKH ::  forall era . Era era => KeyHash 'StakePool era
+alicePoolKH :: forall era. Era era => KeyHash 'StakePool era
 alicePoolKH = (hashKey . vKey) alicePool
 
-aliceVRF:: forall v. VRFAlgorithm v => (VRF.SignKeyVRF v, VRF.VerKeyVRF v)
+aliceVRF :: forall v. VRFAlgorithm v => (VRF.SignKeyVRF v, VRF.VerKeyVRF v)
 aliceVRF = mkVRFKeyPair (0, 0, 0, 0, 3)
 
-alicePoolParams ::  forall era . Era era => PoolParams era
+alicePoolParams :: forall era. Era era => PoolParams era
 alicePoolParams =
   PoolParams
     { _poolPubKey = alicePoolKH,
-      _poolVrf = hashVerKeyVRF . snd $ aliceVRF  @(CC.VRF (Crypto era)),
+      _poolVrf = hashVerKeyVRF . snd $ aliceVRF @(CC.VRF (Crypto era)),
       _poolPledge = Coin 1,
       _poolCost = Coin 5,
       _poolMargin = unsafeMkUnitInterval 0.1,
@@ -155,7 +150,7 @@ bobStake = KeyPair vk sk
 bobSHK :: forall era. Era era => Credential 'Staking era
 bobSHK = (KeyHashObj . hashKey . vKey) bobStake
 
-bobAddr ::forall era. Era era => Addr era
+bobAddr :: forall era. Era era => Addr era
 bobAddr = mkAddr (bobPay, bobStake)
 
 carlPay :: forall era. Era era => KeyPair 'Payment era
@@ -178,22 +173,19 @@ txbSimpleUTxO =
       _mdHash = SNothing
     }
 
-
 -- | to use makeWitnessVKey, we need to know we can sign the TxBody for that era
-
 type BodySignable era = DSignable era (Hash era (TxBody era))
 
-txSimpleUTxO :: forall era. (ShelleyTest era, BodySignable  era) => Tx era
+txSimpleUTxO :: forall era. (ShelleyTest era, BodySignable era) => Tx era
 txSimpleUTxO =
   Tx
     { _body = txbSimpleUTxO,
       _witnessSet =
         mempty
-          { addrWits = makeWitnessesVKey @era (hashAnnotated txbSimpleUTxO) [alicePay @era ]
+          { addrWits = makeWitnessesVKey @era (hashAnnotated txbSimpleUTxO) [alicePay @era]
           },
       _metadata = SNothing
     }
-
 
 txSimpleUTxOBytes16 :: BSL.ByteString
 txSimpleUTxOBytes16 = "83a40081824a9db8a41713ad20245f4e00018182510075c40f44e1c155bedab80d3ec7c2190b0a02185e030aa10081824873ed39075e40d2a650ecca0b99fca3d8d173ed39075e40d2a6f6"
@@ -224,7 +216,7 @@ txbMutiUTxO =
       _mdHash = SNothing
     }
 
-txMutiUTxO :: forall era. (ShelleyTest era, BodySignable  era) => Tx era
+txMutiUTxO :: forall era. (ShelleyTest era, BodySignable era) => Tx era
 txMutiUTxO =
   Tx
     { _body = txbMutiUTxO,
@@ -233,7 +225,7 @@ txMutiUTxO =
           { addrWits =
               makeWitnessesVKey
                 (hashAnnotated txbMutiUTxO)
-                [ alicePay ,
+                [ alicePay,
                   bobPay
                 ]
           },
@@ -257,7 +249,7 @@ txbRegisterStake =
       _mdHash = SNothing
     }
 
-txRegisterStake :: forall era. (ShelleyTest era, BodySignable  era) => Tx era
+txRegisterStake :: forall era. (ShelleyTest era, BodySignable era) => Tx era
 txRegisterStake =
   Tx
     { _body = txbRegisterStake,
@@ -289,7 +281,7 @@ txbDelegateStake =
       _mdHash = SNothing
     }
 
-txDelegateStake :: forall era. (ShelleyTest era, BodySignable  era) => Tx era
+txDelegateStake :: forall era. (ShelleyTest era, BodySignable era) => Tx era
 txDelegateStake =
   Tx
     { _body = txbDelegateStake,
@@ -320,7 +312,7 @@ txbDeregisterStake =
       _mdHash = SNothing
     }
 
-txDeregisterStake :: forall era. (ShelleyTest era, BodySignable  era) => Tx era
+txDeregisterStake :: forall era. (ShelleyTest era, BodySignable era) => Tx era
 txDeregisterStake =
   Tx
     { _body = txbDeregisterStake,
@@ -348,7 +340,7 @@ txbRegisterPool =
       _mdHash = SNothing
     }
 
-txRegisterPool :: forall era. (ShelleyTest era, BodySignable  era) => Tx era
+txRegisterPool :: forall era. (ShelleyTest era, BodySignable era) => Tx era
 txRegisterPool =
   Tx
     { _body = txbRegisterPool,
@@ -376,7 +368,7 @@ txbRetirePool =
       _mdHash = SNothing
     }
 
-txRetirePool :: forall era. (ShelleyTest era, BodySignable  era) => Tx era
+txRetirePool :: forall era. (ShelleyTest era, BodySignable era) => Tx era
 txRetirePool =
   Tx
     { _body = txbRetirePool,
@@ -408,7 +400,7 @@ txbWithMD =
       _mdHash = SJust $ MD.hashMetaData md
     }
 
-txWithMD :: forall era. (ShelleyTest era, BodySignable  era) => Tx era
+txWithMD :: forall era. (ShelleyTest era, BodySignable era) => Tx era
 txWithMD =
   Tx
     { _body = txbWithMD,
@@ -445,7 +437,7 @@ txbWithMultiSig =
       _mdHash = SNothing
     }
 
-txWithMultiSig :: forall era. (ShelleyTest era, BodySignable  era) => Tx era
+txWithMultiSig :: forall era. (ShelleyTest era, BodySignable era) => Tx era
 txWithMultiSig =
   Tx
     { _body = txbWithMultiSig,
@@ -474,7 +466,7 @@ txbWithWithdrawal =
       _mdHash = SNothing
     }
 
-txWithWithdrawal :: forall era. (ShelleyTest era, BodySignable  era) => Tx era
+txWithWithdrawal :: forall era. (ShelleyTest era, BodySignable era) => Tx era
 txWithWithdrawal =
   Tx
     { _body = txbWithWithdrawal,
@@ -498,9 +490,9 @@ txWithWithdrawalBytes16 = "83a50081824a9db8a41713ad20245f4e00018182510075c40f44e
 --       the verification key size is -->  8
 --       the signature size is ---------> 13
 
-
 sizeTests :: TestTree
-sizeTests = testGroup
+sizeTests =
+  testGroup
     "Fee Tests"
     [ testCase "simple utxo" $ sizeTest p txSimpleUTxOBytes16 txSimpleUTxO 75,
       testCase "multiple utxo" $ sizeTest p txMutiUTxOBytes16 txMutiUTxO 198,
@@ -516,4 +508,3 @@ sizeTests = testGroup
   where
     p :: Proxy C
     p = Proxy
-

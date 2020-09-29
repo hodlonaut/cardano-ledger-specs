@@ -20,13 +20,13 @@ module Shelley.Spec.Ledger.STS.Utxow
   )
 where
 
-import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Binary
   ( FromCBOR (..),
     ToCBOR (..),
     encodeListLen,
   )
 import Cardano.Ledger.Era (Era)
+import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Prelude (NoUnexpectedThunks (..), asks)
 import Control.Iterate.SetAlgebra (eval, (∩))
 import Control.State.Transition

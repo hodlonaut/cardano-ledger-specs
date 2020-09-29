@@ -40,7 +40,7 @@ import Test.Shelley.Spec.Ledger.Generator.Core
     mkOCert,
     zero,
   )
-import Test.Shelley.Spec.Ledger.Utils (getBlockNonce, ShelleyTest)
+import Test.Shelley.Spec.Ledger.Utils (ShelleyTest, getBlockNonce)
 
 initStEx1 :: forall era. ShelleyTest era => ChainState era
 initStEx1 = initSt (UTxO Map.empty)

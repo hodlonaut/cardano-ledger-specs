@@ -7,10 +7,10 @@
 
 module Test.Shelley.Spec.Ledger.Orphans () where
 
-import Cardano.Ledger.Shelley (ShelleyEra)
 import qualified Cardano.Crypto.DSIGN as DSIGN
 import Cardano.Ledger.Crypto (DSIGN)
 import Cardano.Ledger.Era
+import Cardano.Ledger.Shelley (ShelleyEra)
 import Shelley.Spec.Ledger.BlockChain (Block (..), TxSeq (..))
 import Shelley.Spec.Ledger.Keys
 import Shelley.Spec.Ledger.LedgerState

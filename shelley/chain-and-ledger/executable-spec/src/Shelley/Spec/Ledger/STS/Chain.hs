@@ -24,10 +24,10 @@ module Shelley.Spec.Ledger.STS.Chain
   )
 where
 
-import Cardano.Ledger.Shelley (ShelleyEra)
 import qualified Cardano.Crypto.VRF as VRF
 import Cardano.Ledger.Crypto (VRF)
 import Cardano.Ledger.Era (Crypto, Era)
+import Cardano.Ledger.Shelley (ShelleyEra)
 import qualified Cardano.Ledger.Val as Val
 import Cardano.Prelude
   ( MonadError (..),

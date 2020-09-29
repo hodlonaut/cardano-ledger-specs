@@ -22,12 +22,12 @@ module Shelley.Spec.Ledger.STS.Ledger
   )
 where
 
-import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Binary
   ( FromCBOR (..),
     ToCBOR (..),
     encodeListLen,
   )
+import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Prelude (NoUnexpectedThunks (..))
 import Control.State.Transition
   ( Assertion (..),
@@ -174,7 +174,7 @@ ledgerTransition = do
   pure (utxoSt', dpstate')
 
 instance
-  ( ShelleyEra era, 
+  ( ShelleyEra era,
     DSignable era (Hash era (TxBody era))
   ) =>
   Embed (DELEGS era) (LEDGER era)

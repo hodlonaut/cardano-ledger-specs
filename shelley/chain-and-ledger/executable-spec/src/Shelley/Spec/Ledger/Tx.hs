@@ -53,7 +53,6 @@ module Shelley.Spec.Ledger.Tx
   )
 where
 
-import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Binary
   ( Annotator (..),
     Decoder,
@@ -71,6 +70,7 @@ import Cardano.Binary
     withSlice,
   )
 import Cardano.Ledger.Era
+import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Prelude
   ( AllowThunksIn (..),
     LByteString,

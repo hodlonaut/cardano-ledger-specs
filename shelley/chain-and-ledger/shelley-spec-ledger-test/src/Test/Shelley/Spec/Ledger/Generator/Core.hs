@@ -472,7 +472,7 @@ findPayScriptFromAddr _ _ =
   error "findPayScriptFromAddr: expects only base and pointer script addresses"
 
 -- | Select one random verification staking key from list of pairs of KeyPair.
-pickStakeKey ::  KeyPairs era -> Gen (VKey 'Staking era)
+pickStakeKey :: KeyPairs era -> Gen (VKey 'Staking era)
 pickStakeKey keys = vKey . snd <$> QC.elements keys
 
 -- | Generates a list of coins for the given 'Addr' and produced a 'TxOut' for each 'Addr'

@@ -52,7 +52,6 @@ module Shelley.Spec.Ledger.BlockChain
   )
 where
 
-import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Binary
   ( Annotator (..),
     Case (..),
@@ -78,6 +77,7 @@ import qualified Cardano.Crypto.KES as KES
 import Cardano.Crypto.Util (SignableRepresentation (..))
 import qualified Cardano.Crypto.VRF as VRF
 import Cardano.Ledger.Era
+import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Prelude
   ( AllowThunksIn (..),
     ByteString,

@@ -18,8 +18,8 @@ module Shelley.Spec.Ledger.STS.Ledgers
   )
 where
 
-import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Binary (FromCBOR (..), ToCBOR (..))
+import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Prelude (NoUnexpectedThunks (..))
 import Control.Monad (foldM)
 import Control.State.Transition

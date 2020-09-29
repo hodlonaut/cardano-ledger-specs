@@ -1,7 +1,7 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 
 -- |
@@ -18,6 +18,7 @@ module Test.Shelley.Spec.Ledger.Examples.Init
 where
 
 import Cardano.Ledger.Era (Era)
+import Cardano.Ledger.Val ((<->))
 import Cardano.Slotting.Slot (WithOrigin (..))
 import Shelley.Spec.Ledger.BaseTypes
   ( Nonce (..),
@@ -43,9 +44,8 @@ import Shelley.Spec.Ledger.Slot
     SlotNo (..),
   )
 import Shelley.Spec.Ledger.UTxO (UTxO (..), balance)
-import Cardano.Ledger.Val((<->))
 import Test.Shelley.Spec.Ledger.Examples.Federation (genDelegs)
-import Test.Shelley.Spec.Ledger.Utils (maxLLSupply, mkHash, unsafeMkUnitInterval, ShelleyTest)
+import Test.Shelley.Spec.Ledger.Utils (ShelleyTest, maxLLSupply, mkHash, unsafeMkUnitInterval)
 
 -- === Initial Protocol Parameters
 --

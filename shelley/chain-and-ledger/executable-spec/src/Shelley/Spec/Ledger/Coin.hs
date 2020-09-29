@@ -57,10 +57,11 @@ rationalToCoinViaFloor r = Coin . floor $ r
 -- with an erroring bounds check here. where should this really live?
 instance Core.Compactible Coin where
   newtype CompactForm Coin = CompactCoin Word64
-  toCompact (Coin c) | c < 0 = error "out of bounds"
-                     | c > (fromIntegral (maxBound :: Word64)) =
-                           error "out of bounds"
-                     | otherwise = CompactCoin (fromIntegral c)
+  toCompact (Coin c)
+    | c < 0 = error "out of bounds"
+    | c > (fromIntegral (maxBound :: Word64)) =
+      error "out of bounds"
+    | otherwise = CompactCoin (fromIntegral c)
   fromCompact (CompactCoin c) = word64ToCoin c
 
 instance ToCBOR (Core.CompactForm Coin) where
