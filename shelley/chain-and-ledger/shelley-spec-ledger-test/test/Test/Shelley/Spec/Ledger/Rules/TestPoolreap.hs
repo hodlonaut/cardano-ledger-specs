@@ -48,6 +48,7 @@ import Shelley.Spec.Ledger.STS.PoolReap
 import Shelley.Spec.Ledger.UTxO (balance)
 import Test.QuickCheck (Property, conjoin)
 import Test.Shelley.Spec.Ledger.Rules.TestPool (getRetiring)
+import Test.Shelley.Spec.Ledger.Utils (ShelleyTest)
 
 -----------------------------
 -- Properties for POOLREAP --
@@ -97,7 +98,7 @@ nonNegativeDeposits tr =
 -- | Check that the sum of circulation, deposits, fees, treasury, rewards and
 -- reserves is constant.
 constantSumPots ::
-  [SourceSignalTarget (POOLREAP era)] ->
+  ShelleyTest era => [SourceSignalTarget (POOLREAP era)] ->
   Property
 constantSumPots tr =
   conjoin $

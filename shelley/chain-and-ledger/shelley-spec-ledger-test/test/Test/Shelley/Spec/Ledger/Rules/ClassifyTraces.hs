@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PatternSynonyms #-}
@@ -97,7 +98,7 @@ import Test.Shelley.Spec.Ledger.Utils
 
 genesisChainState ::
   forall era a.
-  Era era =>
+  ShelleyTest era =>
   Maybe
     ( Control.State.Transition.Extended.IRC (CHAIN era) ->
       QC.Gen
@@ -113,7 +114,7 @@ genesisChainState = Just $ mkGenesisChainState (geConstants (genEnv p))
 
 genesisLedgerState ::
   forall era a.
-  Era era =>
+  ShelleyTest era =>
   Maybe
     ( Control.State.Transition.Extended.IRC (LEDGER era) ->
       QC.Gen
@@ -142,7 +143,7 @@ relevantCasesAreCovered = do
 
 relevantCasesAreCoveredForTrace ::
   forall era.
-  Era era =>
+  ShelleyTest era =>
   Trace (CHAIN era) ->
   Property
 relevantCasesAreCoveredForTrace tr = do
@@ -247,7 +248,7 @@ scriptCredentialCertsRatio certs =
           certs
 
 -- | Extract the certificates from the transactions
-certsByTx :: Era era => [Tx era] -> [[DCert era]]
+certsByTx :: ShelleyTest era => [Tx era] -> [[DCert era]]
 certsByTx txs = toList . _certs . _body <$> txs
 
 ratioInt :: Int -> Int -> Double
@@ -255,7 +256,7 @@ ratioInt x y =
   fromIntegral x / fromIntegral y
 
 -- | Transaction has script locked TxOuts
-txScriptOutputsRatio :: Era era => [StrictSeq (TxOut era)] -> Double
+txScriptOutputsRatio :: ShelleyTest era => [StrictSeq (TxOut era)] -> Double
 txScriptOutputsRatio txoutsList =
   ratioInt
     (sum (map countScriptOuts txoutsList))
@@ -270,17 +271,17 @@ txScriptOutputsRatio txoutsList =
           )
           txouts
 
-hasWithdrawal :: Era era => Tx era -> Bool
+hasWithdrawal :: ShelleyTest era => Tx era -> Bool
 hasWithdrawal = not . null . unWdrl . _wdrls . _body
 
-hasPParamUpdate :: Era era => Tx era -> Bool
+hasPParamUpdate :: ShelleyTest era => Tx era -> Bool
 hasPParamUpdate tx =
   ppUpdates . _txUpdate . _body $ tx
   where
     ppUpdates SNothing = False
     ppUpdates (SJust (Update (ProposedPPUpdates ppUpd) _)) = Map.size ppUpd > 0
 
-hasMetaData :: Era era => Tx era -> Bool
+hasMetaData :: ShelleyTest era => Tx era -> Bool
 hasMetaData tx =
   f . _mdHash . _body $ tx
   where
