@@ -98,7 +98,8 @@ nonNegativeDeposits tr =
 -- | Check that the sum of circulation, deposits, fees, treasury, rewards and
 -- reserves is constant.
 constantSumPots ::
-  ShelleyTest era => [SourceSignalTarget (POOLREAP era)] ->
+  ShelleyTest era =>
+  [SourceSignalTarget (POOLREAP era)] ->
   Property
 constantSumPots tr =
   conjoin $

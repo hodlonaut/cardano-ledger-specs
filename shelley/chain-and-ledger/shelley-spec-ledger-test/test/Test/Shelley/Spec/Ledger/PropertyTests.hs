@@ -7,10 +7,10 @@
 module Test.Shelley.Spec.Ledger.PropertyTests (propertyTests, minimalPropertyTests) where
 
 import Data.Proxy
-import Test.Shelley.Spec.Ledger.ByronTranslation (testGroupByronTranslation)
 import Test.Shelley.Spec.Ledger.Address.Bootstrap
   ( bootstrapHashTest,
   )
+import Test.Shelley.Spec.Ledger.ByronTranslation (testGroupByronTranslation)
 import Test.Shelley.Spec.Ledger.ConcreteCryptoTypes (C)
 import Test.Shelley.Spec.Ledger.LegacyOverlay (legacyOverlayTest)
 import Test.Shelley.Spec.Ledger.Rules.ClassifyTraces
