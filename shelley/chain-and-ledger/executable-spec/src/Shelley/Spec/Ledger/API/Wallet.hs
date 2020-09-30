@@ -59,6 +59,7 @@ import Shelley.Spec.Ledger.Rewards
     nonMyopicStake,
     percentile',
   )
+import Shelley.Spec.Ledger.STS.NewEpoch (calculatePoolDistr)
 import Shelley.Spec.Ledger.STS.Tickn (TicknState (..))
 import Shelley.Spec.Ledger.TxBody (PoolParams (..), TxOut (..))
 import Shelley.Spec.Ledger.UTxO (UTxO (..))
@@ -79,11 +80,11 @@ poolsByTotalStakeFraction ::
 poolsByTotalStakeFraction globals ss =
   PoolDistr poolsByTotalStake
   where
-    EB.SnapShot stake _ _ = currentSnapshot ss
+    snap@(EB.SnapShot stake _ _) = currentSnapshot ss
     Coin totalStake = getTotalStake globals ss
     Coin activeStake = fold . EB.unStake $ stake
     stakeRatio = activeStake % totalStake
-    PoolDistr poolsByActiveStake = nesPd $ ss
+    PoolDistr poolsByActiveStake = calculatePoolDistr snap
     poolsByTotalStake = Map.map toTotalStakeFrac poolsByActiveStake
     toTotalStakeFrac :: IndividualPoolStake era -> IndividualPoolStake era
     toTotalStakeFrac (IndividualPoolStake s vrf) =
