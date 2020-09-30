@@ -296,7 +296,7 @@ genNextDelta
         draftSize =
           ( sum
               [ 5, -- safety net in case the coin or a list prefix rolls over into a larger encoding
-                encodedLen dfees - 1,
+                encodedLen (max dfees (Coin 0)) - 1,
                 foldr (\a b -> b + encodedLen a) 0 extraInputs,
                 encodedLen change,
                 encodedLen extraWitnesses
