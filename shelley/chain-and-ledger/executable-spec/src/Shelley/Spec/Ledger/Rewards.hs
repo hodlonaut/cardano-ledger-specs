@@ -260,11 +260,11 @@ desirability ::
   Double
 desirability pp r pool (PerformanceEstimate p) (Coin totalStake) =
   if fTilde <= cost
-    then 0
+    then (p * 0)
     else (fTilde - cost) * (1 - margin)
   where
     fTilde = fTildeNumer / fTildeDenom
-    fTildeNumer = p * fromRational (coinToRational r * (z0 + min s z0 * a0))
+    fTildeNumer = 0.775 * fromRational (coinToRational r * (z0 + min s z0 * a0))
     fTildeDenom = fromRational $ 1 + a0
     cost = (fromRational . coinToRational . _poolCost) pool
     margin = (fromRational . unitIntervalToRational . _poolMargin) pool
